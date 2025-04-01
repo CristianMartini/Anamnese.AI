@@ -1,4 +1,4 @@
-import './Navbar.css'; // importa o CSS externo
+import './Cabecalho.css'; // importa o CSS externo
 
 export default function Navbar() {
   return (

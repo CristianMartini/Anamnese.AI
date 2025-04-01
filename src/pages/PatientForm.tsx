@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import NavBar from '../components/NavBar';
+import NavBar from '../components/Cabecalho';
 import BasicInfoSection from '../components/BasicInfoSection';
 import YesNoQuestionGroup from '../components/YesNoQuestionGroup';
 import ResponsibilityTermSection from '../components/ResponsibilityTermSection';

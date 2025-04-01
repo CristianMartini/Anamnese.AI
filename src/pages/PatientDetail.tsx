@@ -13,7 +13,7 @@ import {
   createTheme,
 } from '@mui/material';
 
-import NavBar from '../components/NavBar';
+import NavBar from '../components/Cabecalho';
 
 /**
  * Definições de tipos para Sessões e Paciente

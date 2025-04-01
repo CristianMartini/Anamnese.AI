@@ -1,55 +1,60 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './MainNavBar.css';
+import './MainNavbar.css';
 
 function logoutHandler() {
-  // Remova tokens ou faça sua lógica de logout
+  // Exemplo de logout
   localStorage.removeItem('authToken');
   window.location.href = '/login';
 }
 
-function MainNavBar() {
+function GridNavBar() {
   const navigate = useNavigate();
 
+  // Caso deseje um “usuário logado” ou similar
+  const [username] = useState('Jane Doe');
+
   return (
-    <nav className="main-navbar">
-      <div className="nav-left">
-        {/* Logo ou Nome da Aplicação */}
-        <Link to="/dashboard" className="nav-logo">
-          MinhaAplicacao
+    <header className="gridNav-bar">
+      {/* Área esquerda: logo ou ícone */}
+      <div className="gridNav-left">
+        <Link to="/dashboard" className="gridNav-logo">
+          MinimalApp
         </Link>
       </div>
 
-      <div className="nav-right">
-        {/* BOTÃO: Dashboard */}
-        <Link to="/dashboard" className="nav-link">
+      {/* Área central: menu principal */}
+      <nav className="gridNav-center">
+        <Link to="/dashboard" className="gridNav-link">
           Dashboard
         </Link>
-
-        {/* BOTÃO: Novo Paciente */}
-        <Link to="/patient-form" className="nav-link">
+        <Link to="/patient-form" className="gridNav-link">
           Novo Paciente
         </Link>
-
-        {/* BOTÃO: Impressão */}
         <button
           type="button"
-          className="nav-button"
+          className="gridNav-button"
           onClick={() => navigate('/print-preview')}
         >
           Impressão
         </button>
-
-        {/* BOTÃO: Logout */}
         <button
           type="button"
-          className="nav-button"
+          className="gridNav-button"
           onClick={logoutHandler}
         >
           Logout
         </button>
+      </nav>
+
+      {/* Área direita: pode exibir usuário, etc. */}
+      <div className="gridNav-right">
+        <div className="gridNav-user">
+          <span className="gridNav-username">{username}</span>
+        </div>
       </div>
-    </nav>
+    </header>
   );
 }
 
-export default MainNavBar;
+export default GridNavBar;
