@@ -1,0 +1,33 @@
+/* styles.css */
+:root {
+  --primary-color: #4a90e2;
+  --primary-dark: #357ABD;
+  --background-color: #f7f8fa;
+  --text-color: #333;
+  --font-family: 'Roboto', sans-serif;
+  --input-border: #e0e0e0;
+  --input-border-focus: var(--primary-color);
+  --input-bg: #f9f9f9;
+  --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --border-radius: 12px;
+  --transition-speed: 0.3s;
+  --font-size-base: 16px;
+  --label-font-size: 0.95rem;
+  --input-font-size: 1rem;
+  --button-font-size: 1.1rem;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--background-color);
+  font-family: var(--font-family);
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+}
+
+@media (max-width: 768px) {
+  .MuiGrid-item {
+    padding: 8px;
+  }
+}

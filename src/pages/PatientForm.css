@@ -1,0 +1,120 @@
+/* Variáveis para facilitar ajustes e manter consistência */
+
+  
+  /* Container principal do formulário */
+  .form-container {
+    max-width: 1200px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 40px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+  }
+  
+  /* Títulos das seções */
+  .form-container h2,
+  .form-container h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 300;
+  }
+  
+  /* Grid responsivo para os grupos de campos */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  /* Estilo dos grupos de campos */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    font-size: var(--label-font-size);
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-weight: 500;
+  }
+  
+  /* Inputs, selects e textareas */
+  .form-group input[type="text"],
+  .form-group input[type="date"],
+  .form-group input[type="number"],
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 14px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius);
+    background: var(--input-bg);
+    font-size: var(--input-font-size);
+    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+  }
+  
+  /* Foco nos campos */
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--input-border-focus);
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+  }
+  
+  /* Ajuste para textarea */
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  /* Estilo para selects personalizados */
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='none'%20stroke='%234a90e2'%20stroke-width='1'%20d='M0,0%20l2,2%20l2,-2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 8px 10px;
+  }
+  
+  /* Estilo para grupos de checkbox */
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .checkbox-group input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+  }
+  
+  /* Container para o botão de envio */
+  .button-container {
+    text-align: center;
+    margin-top: 40px;
+  }
+  
+  button {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 14px 30px;
+    border-radius: var(--border-radius);
+    font-size: var(--button-font-size);
+    cursor: pointer;
+    transition: background var(--transition-speed);
+  }
+  
+  button:hover {
+    background: var(--primary-dark);
+  }
+  
+  /* Responsividade para telas menores */
+  @media (max-width: 600px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  

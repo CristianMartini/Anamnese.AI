@@ -1,0 +1,88 @@
+/* Navbar.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #fcfcf6; 
+    font-family: sans-serif;
+  }
+  
+  .navbar {
+    width: 100%;
+    height: 80px; /* altura reduzida */
+    background-color: #fcfcf6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px; /* ajuste conforme necessário */
+    box-sizing: border-box;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Área da esquerda */
+  .nav-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .anamnese-title {
+    font-size: 32px;  
+    font-family: serif;  
+    color: #9c9c9c; 
+    margin: 0;
+  }
+  
+  /* Área da direita */
+  .nav-right {
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-end;
+  }
+  
+  /* Bloco de cima (Clínica Cláudia Costa + Estética Avançada) */
+  .clinica-bloco {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 5px;
+  }
+  
+  .clinica-nome {
+    font-family: 'Brush Script MT', cursive, serif;
+    font-size: 26px;
+    color: #8b3e2f; 
+    margin: 0;
+    padding: 0;
+    line-height: 1.2;
+  }
+  
+  .clinica-sub {
+    font-size: 16px;
+    color: #8b3e2f;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Bloco de baixo (Diuly Ferraz + Enfermeira Massoterapeuta) */
+  .profissional-bloco {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+  .profissional-nome {
+    font-size: 20px;
+    color: #9c9c9c;
+    font-family: Arial, sans-serif; 
+    margin: 0;
+    padding: 0;
+    line-height: 1.2;
+  }
+  
+  .profissional-sub {
+    font-size: 16px;
+    color: #9c9c9c;
+    margin: 0;
+    padding: 0;
+  }
+  
