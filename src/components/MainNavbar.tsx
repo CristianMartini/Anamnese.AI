@@ -31,13 +31,7 @@ function GridNavBar() {
         <Link to="/patient-form" className="gridNav-link">
           Novo Paciente
         </Link>
-        <button
-          type="button"
-          className="gridNav-button"
-          onClick={() => navigate('/print-preview')}
-        >
-          Impressão
-        </button>
+        
         
       </nav>
 
