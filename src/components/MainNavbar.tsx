@@ -19,14 +19,14 @@ function GridNavBar() {
       {/* Área esquerda: logo ou ícone */}
       <div className="gridNav-left">
         <Link to="/dashboard" className="gridNav-logo">
-          MinimalApp
+          Anamnese.Ai
         </Link>
       </div>
 
       {/* Área central: menu principal */}
       <nav className="gridNav-center">
         <Link to="/dashboard" className="gridNav-link">
-          Dashboard
+        Lista de Pacientes
         </Link>
         <Link to="/patient-form" className="gridNav-link">
           Novo Paciente
@@ -38,6 +38,12 @@ function GridNavBar() {
         >
           Impressão
         </button>
+        
+      </nav>
+
+      {/* Área direita: pode exibir usuário, etc. */}
+      <div className="gridNav-right">
+        <div className="gridNav-user">
         <button
           type="button"
           className="gridNav-button"
@@ -45,12 +51,6 @@ function GridNavBar() {
         >
           Logout
         </button>
-      </nav>
-
-      {/* Área direita: pode exibir usuário, etc. */}
-      <div className="gridNav-right">
-        <div className="gridNav-user">
-          <span className="gridNav-username">{username}</span>
         </div>
       </div>
     </header>
