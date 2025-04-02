@@ -11,9 +11,13 @@ import {
   Paper,
   ThemeProvider,
   createTheme,
+  IconButton,
+  Divider,
 } from '@mui/material';
+import PrintIcon from '@mui/icons-material/Print';
 
 import NavBar from '../components/Cabecalho';
+import './PatientDetailPrint.css'; // Import the print-specific CSS
 
 /**
  * Definições de tipos para Sessões e Paciente
@@ -37,7 +41,7 @@ interface BodyMeasurements {
 
 interface SessionData {
   id: string;
-  dataSessao: string; 
+  dataSessao: string;
   observacoesGerais: string;
   relatorioSessao: string;
   medidas: BodyMeasurements;
@@ -160,8 +164,8 @@ function YesNoQuestionGroupReadOnly({
   patient: Patient;
 }) {
   return (
-    <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }}>
-      <Typography variant="h6" gutterBottom>
+    <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }} className="section-container">
+      <Typography variant="h6" gutterBottom className="section-title">
         {title}
       </Typography>
 
@@ -171,15 +175,15 @@ function YesNoQuestionGroupReadOnly({
           const observationValue = patient[`${questionItem.name}Observacao`] || '';
 
           return (
-            <Grid item xs={12} sm={6} md={3} key={questionItem.name}>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+            <Grid item xs={12} sm={6} md={3} key={questionItem.name} className="question-item">
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }} className="question-label">
                 {questionItem.label}
               </Typography>
-              <Typography variant="body2" sx={{ ml: 1 }}>
+              <Typography variant="body2" sx={{ ml: 1 }} className="question-answer">
                 {answerValue}
               </Typography>
               {questionItem.requiresObservation && answerValue === 'Sim' && observationValue && (
-                <Typography variant="subtitle2" sx={{ ml: 1, mt: 0.5, fontStyle: 'italic' }}>
+                <Typography variant="subtitle2" sx={{ ml: 1, mt: 0.5, fontStyle: 'italic' }} className="question-observation">
                   Observação: {observationValue}
                 </Typography>
               )}
@@ -197,14 +201,15 @@ function YesNoQuestionGroupReadOnly({
 function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
   if (!sessions || sessions.length === 0) {
     return (
-      <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }}>
-        <Typography variant="h5" gutterBottom>
+      <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }} className="section-container">
+        <Typography variant="h5" gutterBottom className="section-title">
           Histórico de Sessões (0)
         </Typography>
         <Typography
           variant="body2"
           color="textSecondary"
           sx={{ fontStyle: 'italic', textAlign: 'center', my: 2 }}
+          className="no-sessions-message"
         >
           Nenhuma sessão registrada para este paciente.
         </Typography>
@@ -213,12 +218,12 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
   }
 
   return (
-    <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }}>
-      <Typography variant="h5" gutterBottom>
+    <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }} className="section-container sessions-history">
+      <Typography variant="h5" gutterBottom className="section-title">
         Histórico de Sessões ({sessions.length})
       </Typography>
 
-      {sessions.map((sessionItem) => (
+      {sessions.map((sessionItem, index) => (
         <Box
           key={sessionItem.id}
           sx={{
@@ -228,13 +233,15 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
             p: 2,
             backgroundColor: '#f9f9f9'
           }}
+          className="session-item"
+          data-session-index={index}
         >
-          <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }} className="session-date">
             Sessão: {sessionItem.dataSessao}
           </Typography>
 
           {sessionItem.observacoesGerais && (
-            <Box mt={1} mb={1}>
+            <Box mt={1} mb={1} className="session-observations">
               <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                 Observações Gerais:
               </Typography>
@@ -245,10 +252,10 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
             Relatório da Sessão:
           </Typography>
-          <Typography variant="body2">{sessionItem.relatorioSessao}</Typography>
+          <Typography variant="body2" className="session-report">{sessionItem.relatorioSessao}</Typography>
 
           {/* Medidas Corporais */}
-          <Box mt={2}>
+          <Box mt={2} className="body-measurements">
             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
               Medidas Corporais:
             </Typography>
@@ -280,13 +287,92 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
   );
 }
 
+/**
+ * Componente para exibir o cabeçalho de impressão
+ */
+function PrintHeader({ patient }: { patient: Patient }) {
+  // Format date as DD/MM/YYYY
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return '';
+
+    try {
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+    } catch (e) {
+      return dateString;
+    }
+  };
+
+  // Calculate age from birth date
+  const calculateAge = (birthDate: string): string => {
+    if (!birthDate) return '';
+
+    try {
+      const today = new Date();
+      const birthDateObj = new Date(birthDate);
+      let age = today.getFullYear() - birthDateObj.getFullYear();
+      const m = today.getMonth() - birthDateObj.getMonth();
+
+      if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
+        age--;
+      }
+
+      return age.toString();
+    } catch (e) {
+      return '';
+    }
+  };
+
+  return (
+    <Box className="print-header">
+      <Typography variant="h4" align="center" gutterBottom className="print-title">
+        Ficha de Anamnese
+      </Typography>
+
+      <Box className="patient-header-info">
+        <Typography variant="h6" className="patient-name">
+          Paciente: {patient.nome}
+        </Typography>
+        <Typography variant="body1" className="patient-details">
+          Data de Nascimento: {formatDate(patient.dataNascimento)}
+          {patient.dataNascimento && ` (${calculateAge(patient.dataNascimento)} anos)`}
+        </Typography>
+        <Typography variant="body1" className="patient-contact">
+          Telefone: {patient.telefone}
+        </Typography>
+        <Typography variant="body1" className="patient-address">
+          Endereço: {patient.endereco}
+        </Typography>
+      </Box>
+
+      <Divider className="print-divider" />
+    </Box>
+  );
+}
+
+/**
+ * Componente para exibir o rodapé de impressão
+ */
+function PrintFooter() {
+  const today = new Date().toLocaleDateString('pt-BR');
+
+  return (
+    <Box className="print-footer">
+      <Divider className="print-divider" />
+      <Typography variant="body2" align="center" className="print-date">
+        Documento gerado em: {today}
+      </Typography>
+    </Box>
+  );
+}
+
 const theme = createTheme({
   palette: {
     primary: { main: '#4a90e2' },
   },
   typography: {
     fontFamily: 'Roboto, sans-serif',
-  fontSize: 16,
+    fontSize: 16,
   },
 });
 
@@ -310,6 +396,13 @@ function PatientDetail() {
     }
   }, [id]);
 
+  /**
+   * Função para acionar a impressão do documento
+   */
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (loading) {
     return (
       <Box sx={{ textAlign: 'center', mt: 5 }}>
@@ -328,17 +421,36 @@ function PatientDetail() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Paper className="form-container">
-        <NavBar />
+      <Paper className="form-container patient-detail-container">
+     
+        <Box >
+          <NavBar />
+        </Box>
 
-        <Typography variant="h6" align="center" gutterBottom sx={{ mt: 2 }}>
-          Detalhes do Paciente
-        </Typography>
+        
+        {/* Cabeçalho com botão de impressão - visível apenas na tela */}
+        <Box className="detail-header no-print" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Detalhes do Paciente
+          </Typography>
+          <IconButton
+            color="primary"
+            onClick={handlePrint}
+            aria-label="imprimir"
+            size="large"
+            sx={{
+              backgroundColor: '#eef5ff',
+              '&:hover': { backgroundColor: '#dbeaff' }
+            }}
+          >
+            <PrintIcon />
+          </IconButton>
+        </Box>
 
-        <Box sx={{ mt: 3 }}>
+        <Box className="patient-content">
           {/* Seção: Dados Básicos */}
-          <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mb: 3 }}>
-            <Typography variant="h5" gutterBottom>Dados Básicos</Typography>
+          <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mb: 3 }} className="section-container basic-info">
+            <Typography variant="h5" gutterBottom className="section-title">Dados Básicos</Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -348,6 +460,7 @@ function PatientDetail() {
                   fullWidth
                   variant="outlined"
                   margin="normal"
+                  className="text-field-readonly"
                 />
               </Grid>
 
@@ -359,6 +472,7 @@ function PatientDetail() {
                   fullWidth
                   variant="outlined"
                   margin="normal"
+                  className="text-field-readonly"
                 />
               </Grid>
 
@@ -370,6 +484,7 @@ function PatientDetail() {
                   fullWidth
                   variant="outlined"
                   margin="normal"
+                  className="text-field-readonly"
                 />
               </Grid>
 
@@ -384,6 +499,7 @@ function PatientDetail() {
                   variant="outlined"
                   margin="normal"
                   InputLabelProps={{ shrink: true }}
+                  className="text-field-readonly"
                 />
               </Grid>
             </Grid>
@@ -414,16 +530,18 @@ function PatientDetail() {
           <SessionHistoryReadOnly sessions={patient.sessoes || []} />
 
           {/* Termo de Responsabilidade */}
-          <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }}>
-            <Typography variant="h5" gutterBottom>Termo de Responsabilidade</Typography>
+          <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }} className="section-container responsibility-term">
+            <Typography variant="h5" gutterBottom className="section-title">Termo de Responsabilidade</Typography>
             <FormControlLabel
               control={
                 <Checkbox
                   checked={!!patient.termoResponsabilidade}
                   disabled
+                  className="responsibility-checkbox"
                 />
               }
               label="Estou ciente e de acordo com todas as informações acima relacionadas."
+              className="responsibility-label"
             />
             <Grid container spacing={2} mt={2}>
               <Grid item xs={12} sm={6}>
@@ -434,6 +552,7 @@ function PatientDetail() {
                   fullWidth
                   variant="outlined"
                   margin="normal"
+                  className="signature-field"
                 />
               </Grid>
 
@@ -445,13 +564,19 @@ function PatientDetail() {
                   fullWidth
                   variant="outlined"
                   margin="normal"
+                  className="signature-field"
                 />
               </Grid>
             </Grid>
           </Box>
 
-          {/* Botões de ação */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+          {/* Rodapé de impressão - visível apenas na impressão */}
+          <Box className="print-only">
+            <PrintFooter />
+          </Box>
+
+          {/* Botões de ação - visíveis apenas na tela */}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }} className="action-buttons no-print">
             <Button
               variant="contained"
               color="primary"

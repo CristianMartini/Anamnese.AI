@@ -1,0 +1,175 @@
+/* PatientDetailPrint.css - atualizado para esconder a navbar e evitar quebras desnecessárias e reduzir o espaçamento entre linhas */
+
+@media print {
+    .no-print,
+    header,
+    .gridNav-bar,
+    .gridNav-left,
+    .gridNav-center,
+    .gridNav-right {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+    }
+  
+    .print-only {
+      display: block !important;
+    }
+  
+    body {
+      font-size: 11pt;
+      color: #000;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+      line-height: 1.2;
+    }
+  
+    @page {
+      size: A4;
+      margin: 2cm;
+    }
+  
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+  
+    .patient-detail-container {
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      background: #fff !important;
+    }
+  
+    .section-container {
+      break-inside: avoid;
+      border: none !important;
+      margin-top: 6pt !important;
+      margin-bottom: 6pt !important;
+      padding: 4pt 0 !important;
+    }
+  
+    .section-title {
+      font-size: 12.5pt !important;
+      font-weight: bold !important;
+      margin-bottom: 4pt !important;
+      border-bottom: 1px solid #ccc !important;
+      padding-bottom: 2pt !important;
+      color: #222;
+    }
+  
+    .question-item {
+      break-inside: avoid;
+      margin-bottom: 3pt !important;
+    }
+  
+    .question-label {
+      font-size: 9.5pt !important;
+      font-weight: bold !important;
+    }
+  
+    .question-answer {
+      font-size: 9.5pt !important;
+      margin-bottom: 0 !important;
+    }
+  
+    .question-observation {
+      font-size: 8.5pt !important;
+      font-style: italic !important;
+      color: #555 !important;
+    }
+  
+    .session-item {
+      break-inside: avoid;
+      margin-bottom: 8pt !important;
+      padding: 6pt !important;
+      border: 1px solid #ddd !important;
+      background: #f8f8f8 !important;
+    }
+  
+    .session-date {
+      font-size: 10.5pt !important;
+      font-weight: bold !important;
+      margin-bottom: 4pt !important;
+    }
+  
+    .session-observations {
+      font-style: italic;
+      margin: 3pt 0 !important;
+    }
+  
+    .session-report {
+      margin-top: 2pt !important;
+      margin-bottom: 4pt !important;
+    }
+  
+    .body-measurements {
+      font-size: 9.5pt !important;
+      margin-top: 4pt !important;
+    }
+  
+    .responsibility-term {
+      break-before: avoid;
+    }
+  
+    .responsibility-label {
+      font-size: 9.5pt !important;
+    }
+  
+    .signature-field input {
+      border-bottom: 1px solid #000 !important;
+      background: none !important;
+      font-size: 9.5pt !important;
+    }
+  
+    .print-header {
+      margin-bottom: 10pt;
+    }
+  
+    .print-title {
+      font-size: 17pt !important;
+      font-weight: bold !important;
+      margin-bottom: 8pt !important;
+    }
+  
+    .patient-name,
+    .patient-details,
+    .patient-contact,
+    .patient-address {
+      font-size: 10.5pt !important;
+      margin-bottom: 2pt;
+    }
+  
+    .print-footer {
+      font-size: 8.5pt;
+      text-align: center;
+      margin-top: 8pt;
+      color: #666;
+    }
+  
+    .print-divider {
+      margin: 6pt 0;
+    }
+  }
+  
+  .print-only {
+    display: none;
+  }
+  
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .patient-content {
+    margin: 20px 0;
+  }
+  
+  .section-container {
+    margin-bottom: 30px;
+  }
+  
