@@ -6,7 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import PatientForm from './pages/PatientForm';
 import PatientDetail from './pages/PatientDetail';
-import PrintPreview from './pages/PrintPreview';
+
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="patient-form" element={<PatientForm />} />
           <Route path="patient-detail/:id" element={<PatientDetail />} />
-          <Route path="print-preview" element={<PrintPreview />} />
+         
           {/* Você pode adicionar quantas rotas quiser aqui */}
         </Route>
 
