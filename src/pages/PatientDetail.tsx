@@ -344,12 +344,12 @@ function MeasurementsComparisonTable({ sessions }: { sessions: SessionData[] }) 
       </Typography>
       <Box 
         sx={{ 
-          border: '1px solidrgb(126, 105, 105)', 
+          border: '1px solid rgb(126, 105, 105)', 
           borderRadius: 2,
           overflow: 'hidden',
         }}
       >
-        <Grid container sx={{ backgroundColor: '#f5f5f5', p: 1 }}>
+        <Grid container sx={{ backgroundColor: 'rgba(45, 108, 163, 0.3)', p: 1 }}>
           <Grid item xs={4}>
             <Typography variant="subtitle2">Medida</Typography>
           </Grid>
@@ -376,7 +376,7 @@ function MeasurementsComparisonTable({ sessions }: { sessions: SessionData[] }) 
             const diffLeft = calculateDifference(currentLeft, previousLeft);
             
             return (
-              <Grid container key={item.label} sx={{ borderTop: '1px solid #e0e0e0', p: 1 }}>
+              <Grid container key={item.label} sx={{ borderTop: '1px solid ', p: 1 }}>
                 <Grid item xs={4}>
                   <Typography variant="body2">{item.label}</Typography>
                 </Grid>
@@ -410,7 +410,7 @@ function MeasurementsComparisonTable({ sessions }: { sessions: SessionData[] }) 
             const diff = calculateDifference(currentValue, previousValue);
             
             return (
-              <Grid container key={item.label} sx={{ borderTop: '1px solid #e0e0e0', p: 1 }}>
+              <Grid container key={item.label} sx={{ borderTop: '1px solid ', p: 1 }}>
                 <Grid item xs={4}>
                   <Typography variant="body2">{item.label}</Typography>
                 </Grid>
@@ -504,7 +504,7 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
             <Box
               key={sessionItem.id}
               sx={{
-                border: '1px solid #e0e0e0',
+                border: '1px solid rgb(145, 35, 35)',
                 borderRadius: 2,
                 mb: 2,
                 p: 0,
@@ -564,7 +564,7 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
                   
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 1 }}>
+                      <Box sx={{ border: '1px solid', borderRadius: 1, p: 1 }}>
                         <Typography variant="caption" color="textSecondary">Peso / Altura</Typography>
                         <Typography variant="body2">
                           {sessionItem.medidas.peso || '—'} kg / {sessionItem.medidas.altura || '—'} cm
@@ -573,7 +573,7 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
                     </Grid>
                     
                     <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 1 }}>
+                      <Box sx={{ border: '1px solid ', borderRadius: 1, p: 1 }}>
                         <Typography variant="caption" color="textSecondary">Busto / Cintura / Quadril</Typography>
                         <Typography variant="body2">
                           {sessionItem.medidas.busto || '—'} / {sessionItem.medidas.cintura || '—'} / {sessionItem.medidas.quadril || '—'} cm
@@ -582,7 +582,7 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
                     </Grid>
                     
                     <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 1 }}>
+                      <Box sx={{ border: '1px solid', borderRadius: 1, p: 1 }}>
                         <Typography variant="caption" color="textSecondary">Braço D/E</Typography>
                         <Typography variant="body2">
                           {sessionItem.medidas.bracoDireito || '—'} / {sessionItem.medidas.bracoEsquerdo || '—'} cm
@@ -591,7 +591,7 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
                     </Grid>
                     
                     <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 1 }}>
+                      <Box sx={{ border: '1px solid', borderRadius: 1, p: 1 }}>
                         <Typography variant="caption" color="textSecondary">Perna D/E</Typography>
                         <Typography variant="body2">
                           {sessionItem.medidas.pernaDireita || '—'} / {sessionItem.medidas.pernaEsquerda || '—'} cm
@@ -600,7 +600,7 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
                     </Grid>
                     
                     <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 1 }}>
+                      <Box sx={{ border: '1px solid', borderRadius: 1, p: 1 }}>
                         <Typography variant="caption" color="textSecondary">Culote</Typography>
                         <Typography variant="body2">
                           {sessionItem.medidas.culote || '—'} cm
@@ -609,7 +609,7 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
                     </Grid>
                     
                     <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 1 }}>
+                      <Box sx={{ border: '1px solid ', borderRadius: 1, p: 1 }}>
                         <Typography variant="caption" color="textSecondary">Flanco D/E</Typography>
                         <Typography variant="body2">
                           {sessionItem.medidas.flancoDireito || '—'} / {sessionItem.medidas.flancoEsquerdo || '—'} cm
@@ -618,7 +618,7 @@ function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
                     </Grid>
                     
                     <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 1 }}>
+                      <Box sx={{ border: '1px solid', borderRadius: 1, p: 1 }}>
                         <Typography variant="caption" color="textSecondary">Panturrilha D/E</Typography>
                         <Typography variant="body2">
                           {sessionItem.medidas.panturrilhaDireita || '—'} / {sessionItem.medidas.panturrilhaEsquerda || '—'} cm
