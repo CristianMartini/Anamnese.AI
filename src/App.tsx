@@ -11,7 +11,6 @@ import Dashboard from "./pages/Dashboard";
 import PatientForm from "./pages/PatientForm";
 import PatientDetail from "./pages/PatientDetail";
 import PrintPreview from "./pages/PrintPreview";
-import Register from "./pages/Register";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 
@@ -44,16 +43,14 @@ function App() {
         {/* Rotas protegidas */}
         <Route element={<RequireAuth />}>
           <Route path="/" element={<Layout />}>
-           
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="patient-form" element={<PatientForm />} />
+            <Route path="patient-detail/:id" element={<PatientDetail />} />
+            <Route path="print-preview" element={<PrintPreview />} />
           </Route>
         </Route>
         {/* Rotas públicas */}
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="dashboard" element={<Dashboard />} />
-            <Route path="patient-form" element={<PatientForm />} />
-            <Route path="patient-detail/:id" element={<PatientDetail />} />
-            <Route path="print-preview" element={<PrintPreview />} />
       </Routes>
     </Router>
   );
