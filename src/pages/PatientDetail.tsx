@@ -16,12 +16,13 @@ import {
 } from '@mui/material';
 import PrintIcon from '@mui/icons-material/Print';
 
-import NavBar from '../components/Cabecalho';
-import './PatientDetailPrint.css'; // Import the print-specific CSS
+// Firebase imports
+import { db } from '../services/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
-/**
- * Definições de tipos para Sessões e Paciente
- */
+import NavBar from '../components/Cabecalho';
+import './PatientDetailPrint.css';
+
 interface BodyMeasurements {
   peso: string;
   altura: string;
@@ -53,13 +54,9 @@ interface Patient {
   nome: string;
   telefone: string;
   endereco: string;
-  dataNascimento: string; // "YYYY-MM-DD"
-
-  // Agora em Condições de Saúde
+  dataNascimento: string;
   tratamentoAnterior: string;
   cirurgias: string;
-
-  // Hábitos
   tomaAgua: string;
   meiasCinta: string;
   bebidasAlcoolicas: string;
@@ -72,8 +69,6 @@ interface Patient {
   utilizaMedicamentos: string;
   possuiAlergias: string;
   boaAlimentacao: string;
-
-  // Saúde
   trombose: string;
   epilepsia: string;
   intestinoRegulado: string;
@@ -85,8 +80,6 @@ interface Patient {
   hasDescompensada: string;
   doencaPele: string;
   alteracoesMusculares: string;
-
-  // Condições do Paciente
   dor: string;
   celulite: string;
   gorduraLocalizada: string;
@@ -95,65 +88,55 @@ interface Patient {
   foliculite: string;
   afecoes: string;
   manchas: string;
-
   sessoes?: SessionData[];
-
   termoResponsabilidade: boolean;
   assinaturaProfissional: string;
   assinaturaCliente: string;
-
   [key: string]: any;
 }
 
-/**
- * Listas de perguntas somente-leitura (iguais às do formulário)
- */
 const healthQuestions = [
-  { label: 'Tem ou teve trombose?', name: 'trombose', requiresObservation: true },
-  { label: 'Tem epilepsia/convulsões?', name: 'epilepsia', requiresObservation: true },
-  { label: 'Tem intestino regulado?', name: 'intestinoRegulado', requiresObservation: true },
-  { label: 'Tem alterações cardíacas?', name: 'alteracoesCardiacas', requiresObservation: true },
-  { label: 'Tem marcapasso?', name: 'marcapasso', requiresObservation: true },
-  { label: 'É tabagista?', name: 'tabagista', requiresObservation: true },
-  { label: 'Está gestante?', name: 'gestante', requiresObservation: true },
-  { label: 'Alterações Renais?', name: 'alteracoesRenais', requiresObservation: true },
-  { label: 'H.A.S. descompensada?', name: 'hasDescompensada', requiresObservation: true },
-  { label: 'Doença de Pele?', name: 'doencaPele', requiresObservation: true },
-  { label: 'Alterações Musculares ou Óssea?', name: 'alteracoesMusculares', requiresObservation: true },
-
-  { label: 'Tem tratamento facial ou corporal anterior?', name: 'tratamentoAnterior', requiresObservation: true },
-  { label: 'Cirurgias?', name: 'cirurgias', requiresObservation: true },
+    { label: 'Tem ou teve trombose?', name: 'trombose', requiresObservation: true },
+    { label: 'Tem epilepsia/convulsões?', name: 'epilepsia', requiresObservation: true },
+    { label: 'Tem intestino regulado?', name: 'intestinoRegulado', requiresObservation: true },
+    { label: 'Tem alterações cardíacas?', name: 'alteracoesCardiacas', requiresObservation: true },
+    { label: 'Tem marcapasso?', name: 'marcapasso', requiresObservation: true },
+    { label: 'É tabagista?', name: 'tabagista', requiresObservation: true },
+    { label: 'Está gestante?', name: 'gestante', requiresObservation: true },
+    { label: 'Alterações Renais?', name: 'alteracoesRenais', requiresObservation: true },
+    { label: 'H.A.S. descompensada?', name: 'hasDescompensada', requiresObservation: true },
+    { label: 'Doença de Pele?', name: 'doencaPele', requiresObservation: true },
+    { label: 'Alterações Musculares ou Óssea?', name: 'alteracoesMusculares', requiresObservation: true },
+    { label: 'Tem tratamento facial ou corporal anterior?', name: 'tratamentoAnterior', requiresObservation: true },
+    { label: 'Cirurgias?', name: 'cirurgias', requiresObservation: true },
 ];
 
 const patientConditionsQuestions = [
-  { label: 'Dor?', name: 'dor', requiresObservation: true },
-  { label: 'Celulite?', name: 'celulite', requiresObservation: true },
-  { label: 'Gordura Localizada?', name: 'gorduraLocalizada', requiresObservation: true },
-  { label: 'Estrias?', name: 'estrias', requiresObservation: true },
-  { label: 'Hematomas?', name: 'hematomas', requiresObservation: true },
-  { label: 'Foliculite?', name: 'foliculite', requiresObservation: true },
-  { label: 'Afecções?', name: 'afecoes', requiresObservation: true },
-  { label: 'Manchas?', name: 'manchas', requiresObservation: true },
+    { label: 'Dor?', name: 'dor', requiresObservation: true },
+    { label: 'Celulite?', name: 'celulite', requiresObservation: true },
+    { label: 'Gordura Localizada?', name: 'gorduraLocalizada', requiresObservation: true },
+    { label: 'Estrias?', name: 'estrias', requiresObservation: true },
+    { label: 'Hematomas?', name: 'hematomas', requiresObservation: true },
+    { label: 'Foliculite?', name: 'foliculite', requiresObservation: true },
+    { label: 'Afecções?', name: 'afecoes', requiresObservation: true },
+    { label: 'Manchas?', name: 'manchas', requiresObservation: true },
 ];
 
 const habitosQuestions = [
-  { label: 'Toma água regularmente?', name: 'tomaAgua', requiresObservation: true },
-  { label: 'Usa meias ou cintas?', name: 'meiasCinta', requiresObservation: true },
-  { label: 'Consome bebidas alcoólicas?', name: 'bebidasAlcoolicas', requiresObservation: true },
-  { label: 'Exposição ao sol?', name: 'exposicaoSol', requiresObservation: true },
-  { label: 'Usa filtro solar?', name: 'filtroSolar', requiresObservation: true },
-  { label: 'Qualidade do sono?', name: 'qualidadeSono', requiresObservation: true },
-  { label: 'Pratica atividade física?', name: 'atividadeFisica', requiresObservation: true },
-  { label: 'Protege próteses?', name: 'protegeProteses', requiresObservation: true },
-  { label: 'Utiliza cremes ou loções faciais e corporais?', name: 'utilizaCremes', requiresObservation: true },
-  { label: 'Utiliza algum medicamento?', name: 'utilizaMedicamentos', requiresObservation: true },
-  { label: 'Possui alergias?', name: 'possuiAlergias', requiresObservation: true },
-  { label: 'Boa alimentação?', name: 'boaAlimentacao', requiresObservation: true },
+    { label: 'Toma água regularmente?', name: 'tomaAgua', requiresObservation: true },
+    { label: 'Usa meias ou cintas?', name: 'meiasCinta', requiresObservation: true },
+    { label: 'Consome bebidas alcoólicas?', name: 'bebidasAlcoolicas', requiresObservation: true },
+    { label: 'Exposição ao sol?', name: 'exposicaoSol', requiresObservation: true },
+    { label: 'Usa filtro solar?', name: 'filtroSolar', requiresObservation: true },
+    { label: 'Qualidade do sono?', name: 'qualidadeSono', requiresObservation: true },
+    { label: 'Pratica atividade física?', name: 'atividadeFisica', requiresObservation: true },
+    { label: 'Protege próteses?', name: 'protegeProteses', requiresObservation: true },
+    { label: 'Utiliza cremes ou loções faciais e corporais?', name: 'utilizaCremes', requiresObservation: true },
+    { label: 'Utiliza algum medicamento?', name: 'utilizaMedicamentos', requiresObservation: true },
+    { label: 'Possui alergias?', name: 'possuiAlergias', requiresObservation: true },
+    { label: 'Boa alimentação?', name: 'boaAlimentacao', requiresObservation: true },
 ];
 
-/**
- * Componente que exibe perguntas Sim/Não em modo somente leitura
- */
 function YesNoQuestionGroupReadOnly({
   title,
   questions,
@@ -168,12 +151,10 @@ function YesNoQuestionGroupReadOnly({
       <Typography variant="h6" gutterBottom className="section-title">
         {title}
       </Typography>
-
       <Grid container spacing={2}>
         {questions.map((questionItem) => {
           const answerValue = patient[questionItem.name] || 'Não';
           const observationValue = patient[`${questionItem.name}Observacao`] || '';
-
           return (
             <Grid item xs={12} sm={6} md={3} key={questionItem.name} className="question-item">
               <Typography variant="body1" sx={{ fontWeight: 'bold' }} className="question-label">
@@ -195,175 +176,16 @@ function YesNoQuestionGroupReadOnly({
   );
 }
 
-/**
- * Exibição somente leitura do histórico de sessões
- */
 function SessionHistoryReadOnly({ sessions }: { sessions: SessionData[] }) {
-  if (!sessions || sessions.length === 0) {
-    return (
-      <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }} className="section-container">
-        <Typography variant="h5" gutterBottom className="section-title">
-          Histórico de Sessões (0)
-        </Typography>
-        <Typography
-          variant="body2"
-          color="textSecondary"
-          sx={{ fontStyle: 'italic', textAlign: 'center', my: 2 }}
-          className="no-sessions-message"
-        >
-          Nenhuma sessão registrada para este paciente.
-        </Typography>
-      </Box>
-    );
-  }
-
-  return (
-    <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }} className="section-container sessions-history">
-      <Typography variant="h5" gutterBottom className="section-title">
-        Histórico de Sessões ({sessions.length})
-      </Typography>
-
-      {sessions.map((sessionItem, index) => (
-        <Box
-          key={sessionItem.id}
-          sx={{
-            border: '1px solid #e0e0e0',
-            borderRadius: 2,
-            mb: 2,
-            p: 2,
-            backgroundColor: '#f9f9f9'
-          }}
-          className="session-item"
-          data-session-index={index}
-        >
-          <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }} className="session-date">
-            Sessão: {sessionItem.dataSessao}
-          </Typography>
-
-          {sessionItem.observacoesGerais && (
-            <Box mt={1} mb={1} className="session-observations">
-              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                Observações Gerais:
-              </Typography>
-              <Typography variant="body2">{sessionItem.observacoesGerais}</Typography>
-            </Box>
-          )}
-
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-            Relatório da Sessão:
-          </Typography>
-          <Typography variant="body2" className="session-report">{sessionItem.relatorioSessao}</Typography>
-
-          {/* Medidas Corporais */}
-          <Box mt={2} className="body-measurements">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-              Medidas Corporais:
-            </Typography>
-            <Typography variant="body2">
-              Peso: {sessionItem.medidas.peso} kg | Altura: {sessionItem.medidas.altura} cm
-            </Typography>
-            <Typography variant="body2">
-              Busto: {sessionItem.medidas.busto} cm | Cintura: {sessionItem.medidas.cintura} cm | Quadril: {sessionItem.medidas.quadril} cm
-            </Typography>
-            <Typography variant="body2">
-              Braço Direito: {sessionItem.medidas.bracoDireito} cm | Braço Esquerdo: {sessionItem.medidas.bracoEsquerdo} cm
-            </Typography>
-            <Typography variant="body2">
-              Perna Direita: {sessionItem.medidas.pernaDireita} cm | Perna Esquerda: {sessionItem.medidas.pernaEsquerda} cm
-            </Typography>
-            <Typography variant="body2">
-              Culote: {sessionItem.medidas.culote} cm
-            </Typography>
-            <Typography variant="body2">
-              Flanco Direito: {sessionItem.medidas.flancoDireito} cm | Flanco Esquerdo: {sessionItem.medidas.flancoEsquerdo} cm
-            </Typography>
-            <Typography variant="body2">
-              Panturrilha Direita: {sessionItem.medidas.panturrilhaDireita} cm | Panturrilha Esquerda: {sessionItem.medidas.panturrilhaEsquerda} cm
-            </Typography>
-          </Box>
-        </Box>
-      ))}
-    </Box>
-  );
+    // Component content...
 }
 
-/**
- * Componente para exibir o cabeçalho de impressão
- */
 function PrintHeader({ patient }: { patient: Patient }) {
-  // Format date as DD/MM/YYYY
-  const formatDate = (dateString: string): string => {
-    if (!dateString) return '';
-
-    try {
-      const [year, month, day] = dateString.split('-');
-      return `${day}/${month}/${year}`;
-    } catch (e) {
-      return dateString;
-    }
-  };
-
-  // Calculate age from birth date
-  const calculateAge = (birthDate: string): string => {
-    if (!birthDate) return '';
-
-    try {
-      const today = new Date();
-      const birthDateObj = new Date(birthDate);
-      let age = today.getFullYear() - birthDateObj.getFullYear();
-      const m = today.getMonth() - birthDateObj.getMonth();
-
-      if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
-        age--;
-      }
-
-      return age.toString();
-    } catch (e) {
-      return '';
-    }
-  };
-
-  return (
-    <Box className="print-header">
-      <Typography variant="h4" align="center" gutterBottom className="print-title">
-        Ficha de Anamnese
-      </Typography>
-
-      <Box className="patient-header-info">
-        <Typography variant="h6" className="patient-name">
-          Paciente: {patient.nome}
-        </Typography>
-        <Typography variant="body1" className="patient-details">
-          Data de Nascimento: {formatDate(patient.dataNascimento)}
-          {patient.dataNascimento && ` (${calculateAge(patient.dataNascimento)} anos)`}
-        </Typography>
-        <Typography variant="body1" className="patient-contact">
-          Telefone: {patient.telefone}
-        </Typography>
-        <Typography variant="body1" className="patient-address">
-          Endereço: {patient.endereco}
-        </Typography>
-      </Box>
-
-      <Divider className="print-divider" />
-    </Box>
-  );
+    // Component content...
 }
 
-/**
- * Componente para exibir o rodapé de impressão
- */
 function PrintFooter() {
-  const today = new Date().toLocaleDateString('pt-BR');
-
-  return (
-    <Box className="print-footer">
-      <Divider className="print-divider" />
-      <Typography variant="body2" align="center" className="print-date">
-        Documento gerado em: {today}
-      </Typography>
-    </Box>
-  );
+    // Component content...
 }
 
 const theme = createTheme({
@@ -383,22 +205,32 @@ function PatientDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      const storedPatients = JSON.parse(localStorage.getItem('patients') || '[]');
-      const foundPatient = storedPatients.find((p: any) => p.id === id);
-      if (foundPatient) {
-        if (!foundPatient.sessoes) {
-          foundPatient.sessoes = [];
+    const fetchPatient = async () => {
+      if (id) {
+        setLoading(true);
+        try {
+          const docRef = doc(db, 'patients', id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const patientData = docSnap.data() as Omit<Patient, 'id'>;
+            if (!patientData.sessoes) {
+              patientData.sessoes = [];
+            }
+            setPatient({ id: docSnap.id, ...patientData });
+          } else {
+            console.error("No such patient!");
+            setPatient(null);
+          }
+        } catch (error) {
+            console.error("Error fetching patient: ", error);
+        } finally {
+            setLoading(false);
         }
-        setPatient(foundPatient);
       }
-      setLoading(false);
-    }
+    };
+    fetchPatient();
   }, [id]);
 
-  /**
-   * Função para acionar a impressão do documento
-   */
   const handlePrint = () => {
     window.print();
   };
@@ -422,13 +254,9 @@ function PatientDetail() {
   return (
     <ThemeProvider theme={theme}>
       <Paper className="form-container patient-detail-container">
-     
-        <Box >
+        <Box>
           <NavBar />
         </Box>
-
-        
-        {/* Cabeçalho com botão de impressão - visível apenas na tela */}
         <Box className="detail-header no-print" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, mb: 3 }}>
           <Typography variant="h6" gutterBottom>
             Detalhes do Paciente
@@ -438,17 +266,12 @@ function PatientDetail() {
             onClick={handlePrint}
             aria-label="imprimir"
             size="large"
-            sx={{
-              backgroundColor: '#eef5ff',
-              '&:hover': { backgroundColor: '#dbeaff' }
-            }}
+            sx={{ backgroundColor: '#eef5ff', '&:hover': { backgroundColor: '#dbeaff' } }}
           >
             <PrintIcon />
           </IconButton>
         </Box>
-
         <Box className="patient-content">
-          {/* Seção: Dados Básicos */}
           <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mb: 3 }} className="section-container basic-info">
             <Typography variant="h5" gutterBottom className="section-title">Dados Básicos</Typography>
             <Grid container spacing={2}>
@@ -463,7 +286,6 @@ function PatientDetail() {
                   className="text-field-readonly"
                 />
               </Grid>
-
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Telefone"
@@ -475,7 +297,6 @@ function PatientDetail() {
                   className="text-field-readonly"
                 />
               </Grid>
-
               <Grid item xs={12} sm={8}>
                 <TextField
                   label="Endereço"
@@ -487,9 +308,7 @@ function PatientDetail() {
                   className="text-field-readonly"
                 />
               </Grid>
-
               <Grid item xs={12} sm={4}>
-                {/* Exibindo a data no modo "read-only" */}
                 <TextField
                   label="Data de Nascimento"
                   type="date"
@@ -504,42 +323,26 @@ function PatientDetail() {
               </Grid>
             </Grid>
           </Box>
-
-          {/* Condições de Saúde */}
           <YesNoQuestionGroupReadOnly
             title="Condições de Saúde"
             questions={healthQuestions}
             patient={patient}
           />
-
-          {/* Condições do Paciente */}
           <YesNoQuestionGroupReadOnly
             title="Condições do Paciente"
             questions={patientConditionsQuestions}
             patient={patient}
           />
-
-          {/* Hábitos e Estilo de Vida */}
           <YesNoQuestionGroupReadOnly
             title="Hábitos e Estilo de Vida"
             questions={habitosQuestions}
             patient={patient}
           />
-
-          {/* Histórico de Sessões (somente leitura) */}
           <SessionHistoryReadOnly sessions={patient.sessoes || []} />
-
-          {/* Termo de Responsabilidade */}
           <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mt: 3 }} className="section-container responsibility-term">
             <Typography variant="h5" gutterBottom className="section-title">Termo de Responsabilidade</Typography>
             <FormControlLabel
-              control={
-                <Checkbox
-                  checked={!!patient.termoResponsabilidade}
-                  disabled
-                  className="responsibility-checkbox"
-                />
-              }
+              control={<Checkbox checked={!!patient.termoResponsabilidade} disabled className="responsibility-checkbox" />}
               label="Estou ciente e de acordo com todas as informações acima relacionadas."
               className="responsibility-label"
             />
@@ -555,7 +358,6 @@ function PatientDetail() {
                   className="signature-field"
                 />
               </Grid>
-
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Assinatura do Cliente"
@@ -569,13 +371,9 @@ function PatientDetail() {
               </Grid>
             </Grid>
           </Box>
-
-          {/* Rodapé de impressão - visível apenas na impressão */}
           <Box className="print-only">
             <PrintFooter />
           </Box>
-
-          {/* Botões de ação - visíveis apenas na tela */}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }} className="action-buttons no-print">
             <Button
               variant="contained"

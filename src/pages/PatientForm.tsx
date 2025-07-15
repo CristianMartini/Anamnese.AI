@@ -10,17 +10,18 @@ import {
   Typography,
 } from '@mui/material';
 
+// Firebase imports
+import { db } from '../services/firebase';
+import { doc, getDoc, addDoc, updateDoc, collection } from 'firebase/firestore';
+
 import NavBar from '../components/Cabecalho';
 import BasicInfoSection from '../components/BasicInfoSection';
 import YesNoQuestionGroup from '../components/YesNoQuestionGroup';
 import ResponsibilityTermSection from '../components/ResponsibilityTermSection';
 import SessionHistory, { SessionData } from '../components/SessionHistory';
 
-import './PatientForm.css'; // Se tiver um CSS global ou adicional
+import './PatientForm.css';
 
-/**
- * Definição do tema do Material UI
- */
 const theme = createTheme({
   palette: {
     primary: { main: '#4a90e2' },
@@ -33,19 +34,14 @@ const theme = createTheme({
   }
 });
 
-/**
- * Interface principal para o formulário do Paciente
- */
 interface FormData {
   id?: string;
   nome: string;
   telefone: string;
   endereco: string;
-  dataNascimento: string; // armazenado como "YYYY-MM-DD"
-
+  dataNascimento: string;
   tratamentoAnterior: string;
   cirurgias: string;
-
   tomaAgua: string;
   meiasCinta: string;
   bebidasAlcoolicas: string;
@@ -58,7 +54,6 @@ interface FormData {
   utilizaMedicamentos: string;
   possuiAlergias: string;
   boaAlimentacao: string;
-
   trombose: string;
   epilepsia: string;
   intestinoRegulado: string;
@@ -70,7 +65,6 @@ interface FormData {
   hasDescompensada: string;
   doencaPele: string;
   alteracoesMusculares: string;
-
   dor: string;
   celulite: string;
   gorduraLocalizada: string;
@@ -79,7 +73,6 @@ interface FormData {
   foliculite: string;
   afecoes: string;
   manchas: string;
-
   sessoes: SessionData[];
   termoResponsabilidade: boolean;
   assinaturaProfissional: string;
@@ -87,9 +80,6 @@ interface FormData {
   [key: string]: any;
 }
 
-/**
- * Estado inicial do formulário
- */
 const initialState: FormData = {
   nome: "",
   telefone: "",
@@ -134,62 +124,48 @@ const initialState: FormData = {
   assinaturaCliente: ""
 };
 
-/**
- * Perguntas de saúde
- * (Inclui "tratamentoAnterior" e "cirurgias")
- */
 const healthQuestions = [
-  { label: 'Tem ou teve trombose?', name: 'trombose', requiresObservation: true },
-  { label: 'Tem epilepsia/convulsões?', name: 'epilepsia', requiresObservation: true },
-  { label: 'Tem intestino regulado?', name: 'intestinoRegulado', requiresObservation: true },
-  { label: 'Tem alterações cardíacas?', name: 'alteracoesCardiacas', requiresObservation: true },
-  { label: 'Tem marcapasso?', name: 'marcapasso', requiresObservation: true },
-  { label: 'É tabagista?', name: 'tabagista', requiresObservation: true },
-  { label: 'Está gestante?', name: 'gestante', requiresObservation: true },
-  { label: 'Alterações Renais?', name: 'alteracoesRenais', requiresObservation: true },
-  { label: 'H.A.S. descompensada?', name: 'hasDescompensada', requiresObservation: true },
-  { label: 'Doença de Pele?', name: 'doencaPele', requiresObservation: true },
-  { label: 'Alterações Musculares ou Óssea?', name: 'alteracoesMusculares', requiresObservation: true },
-
-  { label: 'Tem tratamento facial ou corporal anterior?', name: 'tratamentoAnterior', requiresObservation: true },
-  { label: 'Cirurgias?', name: 'cirurgias', requiresObservation: true },
+    { label: 'Tem ou teve trombose?', name: 'trombose', requiresObservation: true },
+    { label: 'Tem epilepsia/convulsões?', name: 'epilepsia', requiresObservation: true },
+    { label: 'Tem intestino regulado?', name: 'intestinoRegulado', requiresObservation: true },
+    { label: 'Tem alterações cardíacas?', name: 'alteracoesCardiacas', requiresObservation: true },
+    { label: 'Tem marcapasso?', name: 'marcapasso', requiresObservation: true },
+    { label: 'É tabagista?', name: 'tabagista', requiresObservation: true },
+    { label: 'Está gestante?', name: 'gestante', requiresObservation: true },
+    { label: 'Alterações Renais?', name: 'alteracoesRenais', requiresObservation: true },
+    { label: 'H.A.S. descompensada?', name: 'hasDescompensada', requiresObservation: true },
+    { label: 'Doença de Pele?', name: 'doencaPele', requiresObservation: true },
+    { label: 'Alterações Musculares ou Óssea?', name: 'alteracoesMusculares', requiresObservation: true },
+    { label: 'Tem tratamento facial ou corporal anterior?', name: 'tratamentoAnterior', requiresObservation: true },
+    { label: 'Cirurgias?', name: 'cirurgias', requiresObservation: true },
 ];
 
-/**
- * Perguntas sobre condições do paciente
- */
 const patientConditionsQuestions = [
-  { label: 'Dor?', name: 'dor', requiresObservation: true },
-  { label: 'Celulite?', name: 'celulite', requiresObservation: true },
-  { label: 'Gordura Localizada?', name: 'gorduraLocalizada', requiresObservation: true },
-  { label: 'Estrias?', name: 'estrias', requiresObservation: true },
-  { label: 'Hematomas?', name: 'hematomas', requiresObservation: true },
-  { label: 'Foliculite?', name: 'foliculite', requiresObservation: true },
-  { label: 'Afecções?', name: 'afecoes', requiresObservation: true },
-  { label: 'Manchas?', name: 'manchas', requiresObservation: true },
+    { label: 'Dor?', name: 'dor', requiresObservation: true },
+    { label: 'Celulite?', name: 'celulite', requiresObservation: true },
+    { label: 'Gordura Localizada?', name: 'gorduraLocalizada', requiresObservation: true },
+    { label: 'Estrias?', name: 'estrias', requiresObservation: true },
+    { label: 'Hematomas?', name: 'hematomas', requiresObservation: true },
+    { label: 'Foliculite?', name: 'foliculite', requiresObservation: true },
+    { label: 'Afecções?', name: 'afecoes', requiresObservation: true },
+    { label: 'Manchas?', name: 'manchas', requiresObservation: true },
 ];
 
-/**
- * Perguntas sobre hábitos e estilo de vida
- */
 const habitosQuestions = [
-  { label: 'Toma água regularmente?', name: 'tomaAgua', requiresObservation: true },
-  { label: 'Usa meias ou cintas?', name: 'meiasCinta', requiresObservation: true },
-  { label: 'Consome bebidas alcoólicas?', name: 'bebidasAlcoolicas', requiresObservation: true },
-  { label: 'Exposição ao sol?', name: 'exposicaoSol', requiresObservation: true },
-  { label: 'Usa filtro solar?', name: 'filtroSolar', requiresObservation: true },
-  { label: 'Qualidade do sono?', name: 'qualidadeSono', requiresObservation: true },
-  { label: 'Pratica atividade física?', name: 'atividadeFisica', requiresObservation: true },
-  { label: 'Protege próteses?', name: 'protegeProteses', requiresObservation: true },
-  { label: 'Utiliza cremes ou loções faciais e corporais?', name: 'utilizaCremes', requiresObservation: true },
-  { label: 'Utiliza algum medicamento?', name: 'utilizaMedicamentos', requiresObservation: true },
-  { label: 'Possui alergias?', name: 'possuiAlergias', requiresObservation: true },
-  { label: 'Boa alimentação?', name: 'boaAlimentacao', requiresObservation: true },
+    { label: 'Toma água regularmente?', name: 'tomaAgua', requiresObservation: true },
+    { label: 'Usa meias ou cintas?', name: 'meiasCinta', requiresObservation: true },
+    { label: 'Consome bebidas alcoólicas?', name: 'bebidasAlcoolicas', requiresObservation: true },
+    { label: 'Exposição ao sol?', name: 'exposicaoSol', requiresObservation: true },
+    { label: 'Usa filtro solar?', name: 'filtroSolar', requiresObservation: true },
+    { label: 'Qualidade do sono?', name: 'qualidadeSono', requiresObservation: true },
+    { label: 'Pratica atividade física?', name: 'atividadeFisica', requiresObservation: true },
+    { label: 'Protege próteses?', name: 'protegeProteses', requiresObservation: true },
+    { label: 'Utiliza cremes ou loções faciais e corporais?', name: 'utilizaCremes', requiresObservation: true },
+    { label: 'Utiliza algum medicamento?', name: 'utilizaMedicamentos', requiresObservation: true },
+    { label: 'Possui alergias?', name: 'possuiAlergias', requiresObservation: true },
+    { label: 'Boa alimentação?', name: 'boaAlimentacao', requiresObservation: true },
 ];
 
-/**
- * Função para impedir envio do formulário ao pressionar Enter
- */
 function preventEnterKeySubmission(event: React.KeyboardEvent<HTMLFormElement>) {
   if (event.key === 'Enter') {
     event.preventDefault();
@@ -203,17 +179,24 @@ function PatientForm() {
   const editIdentifier = searchParams.get('edit');
 
   useEffect(() => {
-    if (editIdentifier) {
-      const storedPatients = JSON.parse(localStorage.getItem('patients') || '[]');
-      const patientToEdit = storedPatients.find((p: any) => p.id === editIdentifier);
-      if (patientToEdit) {
-        if (!patientToEdit.sessoes) {
-          patientToEdit.sessoes = [];
+    const fetchPatient = async () => {
+      if (editIdentifier) {
+        const docRef = doc(db, 'patients', editIdentifier);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const patientData = docSnap.data() as FormData;
+          if (!patientData.sessoes) {
+            patientData.sessoes = [];
+          }
+          setFormData({ ...patientData, id: docSnap.id });
+        } else {
+          console.error("No such patient!");
+          navigate("/dashboard");
         }
-        setFormData(patientToEdit);
       }
-    }
-  }, [editIdentifier]);
+    };
+    fetchPatient();
+  }, [editIdentifier, navigate]);
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = event.target;
@@ -229,7 +212,6 @@ function PatientForm() {
     setFormData((previous) => ({ ...previous, [name]: value }));
   }
 
-  // Sessões
   function handleAddSession(newSession: SessionData) {
     setFormData((previous) => ({
       ...previous,
@@ -251,44 +233,38 @@ function PatientForm() {
     }));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    let storedPatients = JSON.parse(localStorage.getItem("patients") || "[]");
+    const { id, ...patientData } = formData; // remove 'id' from the data to be saved
 
-    if (editIdentifier) {
-      // Atualiza
-      storedPatients = storedPatients.map((patientItem: any) =>
-        (patientItem.id === editIdentifier ? { ...formData, id: editIdentifier } : patientItem)
-      );
-    } else {
-      // Novo
-      const newPatientObject = { id: uuidv4(), ...formData };
-      storedPatients.push(newPatientObject);
+    try {
+      if (editIdentifier) {
+        const patientRef = doc(db, "patients", editIdentifier);
+        await updateDoc(patientRef, patientData);
+      } else {
+        await addDoc(collection(db, "patients"), patientData);
+      }
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error saving patient data: ", error);
+      // Optionally, show an error message to the user
     }
-
-    localStorage.setItem("patients", JSON.stringify(storedPatients));
-    navigate("/dashboard");
   }
 
   return (
     <ThemeProvider theme={theme}>
       <Paper className="form-container">
         <NavBar />
-
         <Typography variant="h6" align="center" gutterBottom sx={{ mt: 2 }}>
           {editIdentifier ? "Editar Paciente" : "Cadastro de Paciente "}
         </Typography>
-
         <form onSubmit={handleSubmit} onKeyDown={preventEnterKeySubmission}>
-          {/* Seção: Dados Básicos */}
           <section className="section">
             <BasicInfoSection
               formData={formData}
               handleInputChange={handleInputChange}
             />
           </section>
-
-          {/* Seção: Condições de Saúde */}
           <section className="section">
             <Typography variant="h5" align="center" gutterBottom>
               Condições de Saúde
@@ -299,8 +275,6 @@ function PatientForm() {
               onChange={handleYesNoChange}
             />
           </section>
-
-          {/* Seção: Condições do Paciente */}
           <section className="section">
             <Typography variant="h5" align="center" gutterBottom>
               Condições do Paciente
@@ -311,8 +285,6 @@ function PatientForm() {
               onChange={handleYesNoChange}
             />
           </section>
-
-          {/* Seção: Hábitos */}
           <section className="section">
             <Typography variant="h5" align="center" gutterBottom>
               Hábitos e Estilo de Vida
@@ -323,8 +295,6 @@ function PatientForm() {
               onChange={handleYesNoChange}
             />
           </section>
-
-          {/* Seção: Histórico de Sessões */}
           <section className="section">
             <Typography variant="h5" align="center" gutterBottom>
               Histórico de Sessões
@@ -336,8 +306,6 @@ function PatientForm() {
               onUpdateSession={handleUpdateSession}
             />
           </section>
-
-          {/* Seção: Termo de Responsabilidade */}
           <section className="section">
             <Typography variant="h5" align="center" gutterBottom>
               Termo de Responsabilidade
@@ -348,7 +316,6 @@ function PatientForm() {
               handleCheckboxChange={handleCheckboxChange}
             />
           </section>
-
           <Box sx={{ mt: 3, textAlign: 'center' }}>
             <Button type="submit" variant="contained" size="large">
               {editIdentifier ? "Atualizar" : "Salvar"}
