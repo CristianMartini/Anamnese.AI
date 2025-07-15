@@ -9,8 +9,7 @@ import {
   ThemeProvider,
   createTheme,
 } from "@mui/material";
-// import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import "./Login.css";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 const theme = createTheme({
   palette: {
@@ -22,17 +21,34 @@ const theme = createTheme({
   },
 });
 
-function Login() {
+function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    // Login temporário: permite qualquer email e senha
-    navigate("/dashboard");
+    setSuccess("");
+    if (password !== confirmPassword) {
+      setError("As senhas não coincidem!");
+      return;
+    }
+    const auth = getAuth();
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      setSuccess("Usuário criado com sucesso! Redirecionando para login...");
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError("Erro ao criar usuário: " + err.message);
+      } else {
+        setError("Erro desconhecido ao criar usuário.");
+      }
+    }
   };
 
   return (
@@ -44,12 +60,9 @@ function Login() {
         height="100vh"
         bgcolor="#f7f8fa"
       >
-        <Paper elevation={3} sx={{ p: 4, width: 320, textAlign: "center" }}>
+        <Paper elevation={3} sx={{ p: 4, width: 340, textAlign: "center" }}>
           <Typography variant="h5" mb={2}>
-            Bem-vindo!
-          </Typography>
-          <Typography variant="body2" mb={2}>
-            Por favor, faça login para continuar.
+            Criar nova conta
           </Typography>
           <Box component="form" onSubmit={handleSubmit}>
             <TextField
@@ -70,22 +83,36 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               sx={{ mb: 2 }}
             />
+            <TextField
+              label="Confirmar Senha"
+              type="password"
+              fullWidth
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              sx={{ mb: 2 }}
+            />
             {error && (
               <Typography color="error" variant="body2" mb={2}>
                 {error}
               </Typography>
             )}
+            {success && (
+              <Typography color="primary" variant="body2" mb={2}>
+                {success}
+              </Typography>
+            )}
             <Button type="submit" variant="contained" color="primary" fullWidth>
-              Entrar
+              Registrar
             </Button>
             <Button
               variant="text"
               color="primary"
               fullWidth
               sx={{ mt: 1 }}
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/login")}
             >
-              Criar nova conta
+              Já tem conta? Entrar
             </Button>
           </Box>
         </Paper>
@@ -94,4 +121,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;
