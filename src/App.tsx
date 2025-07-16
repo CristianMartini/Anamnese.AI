@@ -14,11 +14,11 @@ import PatientForm from "./pages/PatientForm";
 import PatientDetail from "./pages/PatientDetail";
 import PrintPreview from "./pages/PrintPreview";
 import AdminPanel from "./pages/AdminPanel";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, type User } from "firebase/auth";
 import { useEffect, useState } from "react";
 
 function RequireAuth() {
-  const [user, setUser] = useState<unknown>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
