@@ -10,6 +10,7 @@ import {
   createTheme,
 } from "@mui/material";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, setDoc, doc } from "firebase/firestore";
 
 const theme = createTheme({
   palette: {
@@ -39,7 +40,16 @@ function Register() {
     }
     const auth = getAuth();
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const db = getFirestore();
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        email,
+        role: "user",
+      });
       setSuccess("Usuário criado com sucesso! Redirecionando para login...");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err: unknown) {
