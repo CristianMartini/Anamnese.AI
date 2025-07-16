@@ -10,7 +10,6 @@ import {
   createTheme,
 } from "@mui/material";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, setDoc, doc } from "firebase/firestore";
 
 const theme = createTheme({
   palette: {
