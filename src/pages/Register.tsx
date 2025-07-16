@@ -40,16 +40,7 @@ function Register() {
     }
     const auth = getAuth();
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const db = getFirestore();
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        email,
-        role: "user",
-      });
+      await createUserWithEmailAndPassword(auth, email, password);
       setSuccess("Usuário criado com sucesso! Redirecionando para login...");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err: unknown) {
