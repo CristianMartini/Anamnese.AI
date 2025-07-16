@@ -9,7 +9,7 @@ import {
   ThemeProvider,
   createTheme,
 } from "@mui/material";
-// import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import "./Login.css";
 
 const theme = createTheme({
@@ -31,8 +31,17 @@ function Login() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    // Login temporário: permite qualquer email e senha
-    navigate("/dashboard");
+    const auth = getAuth();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate("/dashboard");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError("Erro ao fazer login: " + err.message);
+      } else {
+        setError("Erro desconhecido ao fazer login.");
+      }
+    }
   };
 
   return (
